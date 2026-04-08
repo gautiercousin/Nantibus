@@ -1,87 +1,42 @@
 "use strict"
 
-/** PositionException est une exception levée lors de la création d'une Position. */
-class PositionException extends Error {
+import { checkRequiredAttributes, validateAndAssignRequired } from './Validation.js';
 
-    /**
-     * Constructeur de PositionException.
-     * @param message Message de l'exception
-     */
+class PositionException extends Error {
     constructor(message) {
         super(message);
-        this.name = "Position Exception"
+        this.name = "Position Exception";
     }
 }
 
-/** Map qui répertorie les attributs et leurs types respectifs. */
-const attributesTypes =new Map([
-    ["lat","number"],
-    ["lon","number"]
-])
-
-/** Position est une classe qui représente un point géographique. */
 class Position {
-    lat
-    lon
+    lat;
+    lon;
 
-    /**
-     * Constructeur de Position.
-     * Elle vérifie les types et la présence des données.
-     * Elle accepte uniquement les :
-     *                  latitudes : latitude > 180 et latitude < -180
-     *                  longitude : longitude < -90 || longitude > 90
-     * Sinon elle renvoie une PositionException.
-     *
-     * @param obj Objet contenant les attributs de la position (lat, lon)
-     */
+    static requiredAttributesTypes = new Map([
+        ["lat", "number"],
+        ["lon", "number"]
+    ]);
+
     constructor(obj) {
-        if (obj.lat === undefined || obj.lon === undefined){
-            throw new PositionException("Invalid type (latitude or longitude undefined)")
+        checkRequiredAttributes(obj, Position.requiredAttributesTypes, PositionException, this._camelToSnake.bind(this));
+        validateAndAssignRequired(obj, Position.requiredAttributesTypes, this, PositionException, this._camelToSnake.bind(this));
+
+        if (this.lat > 180 || this.lat < -180 || this.lon < -90 || this.lon > 90) {
+            throw new PositionException("Invalid value (latitude must be between -180 and 180, longitude must be between -90 and 90)");
         }
-        const objAttributesTypes =new Map(Object.entries(obj).map(([key,value])=>
-            [key, typeof value]
-        ))
-
-        // Vérification des types de l'objet donné
-        if (!(attributesTypes.size === objAttributesTypes.size &&
-            Array.from(attributesTypes.keys())
-                .every((key) => attributesTypes.get(key) === objAttributesTypes.get(key))
-        )) {
-            throw new PositionException("Invalid type (latitude and longitude must be numbers)")
-        }
-
-        // Vérification de la cohérence des données
-        if (obj.lat > 180 || obj.lat < -180 || obj.lon < -90 || obj.lon >90){
-            throw new PositionException("Invalid value (latitude must be between -180 and 180, longitude must be between -90 and 90)")
-        }
-
-        this.lat = obj.lat
-        this.lon = obj.lon
     }
 
-    /**
-     * toString de Position.
-     * @return Représentation de la position au format JSON
-     */
-    toString(){
-        return JSON.stringify({lat: this.lat, lon: this.lon})
+    _camelToSnake(str) {
+        return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
     }
 
-    /**
-     * get latitude.
-     * @return Latitude de la station
-     */
-    get latitude () {
-        return this.lat
+    toString() {
+        return JSON.stringify(this);
     }
 
-    /**
-     * get longitude.
-     * @return Longitude de la station
-     */
-    get longitude () {
-        return this.lon
-    }
+    
 }
 
-export default Position
+export default Position;
+export { PositionException };

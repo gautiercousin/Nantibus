@@ -43,11 +43,18 @@ export function getOpenDataRecordsUrl({
     orderBy = "number",
     limit = -1
 } = {}) {
-    const query = buildQuery({
-        where: `status = "${status}"`,
-        order_by: orderBy,
-        limit: String(limit)
-    });
+    let query
+    if (dataset === "244400404_gonfleurs-libre-service-nantes-metropole") {
+        query = buildQuery({
+            limit: String(limit)
+        });
+    } else {
+        query = buildQuery({
+            where: `status = "${status}"`,
+            order_by: orderBy,
+            limit: String(limit)
+        });
+    }
 
     return `${getOpenDataDatasetBaseUrl(dataset)}records?${query}`;
 }

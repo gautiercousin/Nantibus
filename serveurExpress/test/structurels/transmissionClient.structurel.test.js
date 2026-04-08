@@ -6,7 +6,7 @@ import { it, afterEach } from "node:test";
 
 const daoFilePath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  "../api/dao/transmissionClientDAO.js"
+  "../../api/dao/transmissionClientDAO.js"
 );
 
 // Variables pour sauvegarder les originaux

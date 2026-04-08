@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import HttpsProxyAgent from 'https-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { OPEN_DATA_RESOURCES, getOpenDataRecordsUrl, getOpenDataRecordsPageUrl } from './urlFactory.js';
 
 function buildAgent() {
@@ -43,7 +43,7 @@ async function fetchPaginatedRecords(agent, queryOptions) {
 }
 
 const stationFetchDAO = {
-    async findAllByResource(resourceNameOrDataset, options = {}) {
+    async findAllByResource(resourceNameOrDataset, options = {}, model) {
         try {
             const agent = buildAgent();
             const queryOptions = {
@@ -54,7 +54,20 @@ const stationFetchDAO = {
                 pageSize: options.pageSize
             };
 
-            return await fetchPaginatedRecords(agent, queryOptions);
+
+            const data = await fetchPaginatedRecords(agent, queryOptions);
+
+            if (typeof model === "function") {
+                try {
+                    data.map(item => new model(item));
+                } catch (e) {
+                    console.error("Erreur de validation du modèle :", e.message);
+                    throw new Error("Données reçues invalides");
+                }
+            }
+            
+            return data;
+
         } catch (err) {
             console.error("Erreur dans stationFetchDAO :", err.message);
             throw err;

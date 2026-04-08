@@ -1,6 +1,6 @@
 "use strict"
 import recuperationTraitementDAO from "../dao/recuperationTraitementDAO.js";
- let lastUpdate = null;
+let lastUpdate = null;
 let stationsCache = [];
 
 function normalizeText(value) {
@@ -26,7 +26,7 @@ function distanceKm(lat1, lon1, lat2, lon2) {
 }
 
 function isValidCoordinate(lat, lon) {
-    return lat !== null && lon !== null && lat >= -180 && lat <= 180 && lon >= -90 && lon <= 90;
+    return lat !== null && lon !== null && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
 }
 
 const stationController = {
@@ -51,20 +51,20 @@ const stationController = {
         }
     },
 
-    // Test: curl -i "http://localhost:8081/api/v0/stations/1"
+    // Test: curl -i "http://localhost:8081/api/v0/stations/id/1"
     getStationById: async (req, res) => {
         try {
             // evite d'appeller l'update si c'est pas nécéssaire
             const id = Number(req.params.id);
             if (!Number.isInteger(id)) {
-                return res.status(400).json({ message: "id station invalide" });
+                return res.status(400).json({ message: "ID station invalide" });
             }
 
             const stations = await stationController.updateBD();
             const station = stations.find((s) => s.id === id);
 
             if (!station) {
-                return res.status(404).json({ message: "station introuvable" });
+                return res.status(404).json({ message: "Station introuvable" });
             }
 
             res.status(200).json(station);
@@ -78,7 +78,7 @@ const stationController = {
         try {
             const city = normalizeText(req.params.city);
             if (!city) {
-                return res.status(400).json({ message: "ville invalide" });
+                return res.status(400).json({ message: "Ville invalide" });
             }
 
             const stations = await stationController.updateBD();
@@ -94,7 +94,7 @@ const stationController = {
         try {
             const status = normalizeText(req.params.status);
             if (!status) {
-                return res.status(400).json({ message: "status invalide" });
+                return res.status(400).json({ message: "Status invalide" });
             }
 
             const stations = await stationController.updateBD();
@@ -113,7 +113,7 @@ const stationController = {
             const radiusKm = toNumber(req.query.radiusKm) ?? 2;
 
             if (lat === null || lon === null || radiusKm <= 0) {
-                return res.status(400).json({ message: "parametres geographiques invalides" });
+                return res.status(400).json({ message: "Paramètres géographiques invalides" });
             }
 
             const stations = await stationController.updateBD();
@@ -141,7 +141,7 @@ const stationController = {
             const lonB = toNumber(req.query.lonB);
 
             if (!isValidCoordinate(latA, lonA) || !isValidCoordinate(latB, lonB)) {
-                return res.status(400).json({ message: "parametres geographiques invalides" });
+                return res.status(400).json({ message: "Paramètres géographiques invalides" });
             }
 
             const distance = distanceKm(latA, lonA, latB, lonB);
@@ -155,6 +155,70 @@ const stationController = {
         } catch (error) {
             res.status(502).json({ message: error.message });
         }
-    }
+    },
+    // Test: curl -i "http://localhost:8081/api/v0/stations/name/gare"
+    getStationsByName: async (req, res) => {
+        try {
+            const stations = await stationController.updateBD();
+            const name = req.params.name.toString().trim()
+            if (name === undefined || name == null){
+                return res.status(400).json({ message: "parametre name invalide" });
+            }
+            const stationsFiltre = stations.filter((s)=>s.name.toLowerCase().includes(req.params.name.toLowerCase()))
+            if (stationsFiltre.length === 0){
+                return res.status(404).json({ message: `aucune station nommée de la sorte existe` });
+            }
+            res.status(200).json(stationsFiltre);
+        } catch (error) {
+            res.status(502).json({ message: error.message });
+        }
+    },
+
+    // Test: curl -i "http://localhost:8081/api/v0/stations/available"
+    getAvailableStations: async (req, res) => {
+        try {
+            const stations = await stationController.updateBD();
+            const filtered = stations.filter((s) => {
+                const spots = toNumber(s?.availableSpots);
+                return spots !== null && spots > 0;
+            });
+            res.status(200).json(filtered);
+        } catch (error) {
+            res.status(502).json({ message: error.message });
+        }
+    },
+
+    // Test: curl -i "http://localhost:8081/api/v0/stations/search?city=Nantes&status=Disponible&name=gare&minAvailable=1"
+    // curl -i "http://localhost:8081/api/v0/stations/search?name=gare"
+    getStationsSearch: async (req, res) => {
+        try {
+            const city = normalizeText(req.query.city);
+            const status = normalizeText(req.query.status);
+            const name = normalizeText(req.query.name);
+
+            let minAvailable = null;
+            if (req.query.minAvailable !== undefined) {
+                minAvailable = toNumber(req.query.minAvailable);
+                if (minAvailable === null || minAvailable < 0) {
+                    return res.status(400).json({ message: "minAvailable invalide" });
+                }
+            }
+
+            const stations = await stationController.updateBD();
+            const filtered = stations.filter((s) => {
+                const byCity = !city || normalizeText(s?.address?.city) === city;
+                const byStatus = !status || normalizeText(s?.status) === status;
+                const byName = !name || normalizeText(s?.name).includes(name);
+                const byMinAvailable = minAvailable === null || ((toNumber(s?.availableSpots) ?? -1) >= minAvailable);
+                return byCity && byStatus && byName && byMinAvailable;
+            });
+
+            res.status(200).json(filtered);
+        } catch (error) {
+            res.status(502).json({ message: error.message });
+        }
+    },
+
+
 }
 export default stationController

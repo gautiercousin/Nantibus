@@ -6,7 +6,7 @@ import { it, beforeEach, afterEach } from "node:test";
 
 const originalProxy = process.env.https_proxy;
 const originalTlsFlag = process.env.NODE_TLS_REJECT_UNAUTHORIZED;
-const daoFilePath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../api/dao/stationFetchDAO.mjs");
+const daoFilePath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../api/dao/stationFetchDAO.mjs");
 const expectedBaseUrl = "https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_parking-velos-nantes-metropole-disponibilites/records?where=status%20%3D%20%22Disponible%22&order_by=number&limit=-1";
 
 function mockFetchResponse(payload) {
@@ -39,7 +39,7 @@ async function loadStationFetchDAO(mockFetch) {
     const source = await readFile(daoFilePath, "utf8");
     const patchedSource = source
         .replace("import fetch from 'node-fetch';", "const fetch = globalThis.__TEST_FETCH__;")
-        .replace("import HttpsProxyAgent from 'https-proxy-agent';", "const HttpsProxyAgent = globalThis.__TEST_HTTPS_PROXY_AGENT__;")
+        .replace("import { HttpsProxyAgent } from 'https-proxy-agent';", "const { HttpsProxyAgent } = globalThis.__TEST_HTTPS_PROXY_AGENT__;")
         .replace(
             "import { OPEN_DATA_RESOURCES, getOpenDataRecordsUrl, getOpenDataRecordsPageUrl } from './urlFactory.js';",
             "const { OPEN_DATA_RESOURCES, getOpenDataRecordsUrl, getOpenDataRecordsPageUrl } = globalThis.__TEST_URL_FACTORY__;"
@@ -47,9 +47,11 @@ async function loadStationFetchDAO(mockFetch) {
         + `\n// cache-buster: ${Date.now()}-${Math.random()}`;
 
     globalThis.__TEST_FETCH__ = mockFetch;
-    globalThis.__TEST_HTTPS_PROXY_AGENT__ = class HttpsProxyAgentMock {
-        constructor(proxy) {
-            this.proxy = proxy;
+    globalThis.__TEST_HTTPS_PROXY_AGENT__ = {
+        HttpsProxyAgent: class HttpsProxyAgentMock {
+            constructor(proxy) {
+                this.proxy = proxy;
+            }
         }
     };
     globalThis.__TEST_URL_FACTORY__ = {

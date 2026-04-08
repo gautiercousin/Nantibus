@@ -9,7 +9,7 @@ import {
     getOpenDataRecordsUrlForResource,
     getInternalApiBaseUrl,
     getInternalTransmissionUrl
-} from "../api/dao/urlFactory.js";
+} from "../../api/dao/urlFactory.js";
 
 const originalIp = process.env.IP;
 const originalPort = process.env.PORT;

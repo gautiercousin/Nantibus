@@ -1,7 +1,7 @@
 "use strict"
 import express from 'express'
-import recuperationUtilisationDAO from '../dao/recuperationUtilisationDAO.js'
 import stationController from '../controller/stationController.mjs'
+import gonfleurController from "../controller/gonfleurController.mjs";
 
 const router = express.Router()
 
@@ -16,27 +16,30 @@ router.get('/stations/status/:status', stationController.getStationsByStatus)
 router.get('/stations/near', stationController.getStationsNear)
 // Test: curl -i "http://localhost:8081/api/v0/stations/itinerary?latA=47.218&lonA=-1.553&latB=47.230&lonB=-1.617"
 router.get('/stations/itinerary', stationController.getItineraryBetweenPoints)
+// Test: curl -i "http://localhost:8081/api/v0/stations/name/gare"
+router.get('/stations/name/:name', stationController.getStationsByName)
 // Test: curl -i "http://localhost:8081/api/v0/stations/1"
 router.get('/stations/:id', stationController.getStationById)
 
-// route pour l'automate 3
-router.post("/transmission", (req, res) => {
-    console.log("Données reçues :", req.body)
-    res.json({ confirmation: true })
-})
+// Test: curl -i "http://localhost:8081/api/v0/stations/available"
+router.get('/stations/available', stationController.getAvailableStations)
+// Test: curl -i "http://localhost:8081/api/v0/stations/search?city=Nantes&status=Disponible&name=gare&minAvailable=1"
+// curl -i "http://localhost:8081/api/v0/stations/search?name=gare"
+router.get('/stations/search', stationController.getStationsSearch)
 
 
-// route pour l'automate 4
-router.get("/utilisation", (req, res) => {
-    console.log("Requête d'utilisation reçue")
+// route pour récupérer les gonfleurs
+// Test: curl -i "http://localhost:8081/api/v0/gonfleurs"
+router.get('/gonfleurs', gonfleurController.getGonfleurs)
+// Test: curl -i "http://localhost:8081/api/v0/gonfleurs/city/Nantes"
+router.get('/gonfleurs/city/:city', gonfleurController.getGonfleursByCity)
+// Test: curl -i "http://localhost:8081/api/v0/gonfleurs/id/1"
+router.get('/gonfleurs/id/:id', gonfleurController.getGonfleurById)
 
-    recuperationUtilisationDAO.envoyerRequete()
-        .then((donneesTransmission) => {
-            res.json(donneesTransmission)
-        })
-        .catch((error) => {
-            res.status(502).json({ message: error.message })
-        })
-})
+
+// Test: curl -i "http://localhost:8081/api/v0/stations/id/1"
+router.get('/stations/id/:id', stationController.getStationById)
+
+
 
 export default router

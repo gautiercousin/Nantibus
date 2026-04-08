@@ -1,6 +1,5 @@
 import Station from "../model/Station.js";
-import stationFetchDAO from './stationFetchDAO.mjs';
-
+import stationFetchDAO from "./stationFetchDAO.mjs";
 /*
 * Récupération et traitement des données de l'API vu sur l'automate 2
  */
@@ -37,7 +36,7 @@ const recuperationTraitementDAO = {
                     },
 
                     capacity: Number(s.capacity),
-                    availableSpots: Number(s.availablespots ?? 0),
+                    available_spots: Number(s.availablespots ?? 0),
 
                     position: {
                         lat: s.geometrie.lat,

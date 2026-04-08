@@ -2,14 +2,301 @@
   "swagger": "2.0",
   "info": {
     "title": "Nantibus User API Documentation",
-    "description": "",
+    "description": "Bienvenue sur le Swagger de l'API de Nantibus ! ",
     "version": "1.0.0"
   },
-  "host": "127.0.0.1:8081/api/v0",
-  "basePath": "/",
+  "host": "127.0.0.1:8081",
+  "basePath": "/api/v0",
   "schemes": [
-    "http",
-    "https"
+    "http"
   ],
-  "paths": {}
+  "paths": {
+    "/stations": {
+      "get": {
+        "description": "Récupère la liste de toutes les stations",
+        "responses": {
+          "200": {
+            "description": "Liste de stations"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/stations/city/{city}": {
+      "get": {
+        "description": "Récupère la liste de toutes les stations d'une ville",
+        "parameters": [
+          {
+            "name": "city",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste de stations"
+          },
+          "400": {
+            "description": "Bad Request avec message `Ville invalide` dans le corps de la réponse"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/stations/status/{status}": {
+      "get": {
+        "description": "Récupère la liste de toutes les stations ayant le statut donné",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste de stations"
+          },
+          "400": {
+            "description": "Bad Request avec message `Statut invalide` dans le corps de la réponse"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/stations/near": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "radiusKm",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste de stations"
+          },
+          "400": {
+            "description": "Bad Request avec message `Paramètres géographiques invalides` dans le corps de la réponse"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/stations/itinerary": {
+      "get": {
+        "description": "Récupère la liste de toutes les stations situées sur l'itinéraire entre les points A et B",
+        "parameters": [
+          {
+            "name": "latA",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "lonA",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "latB",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "lonB",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste de stations"
+          },
+          "400": {
+            "description": "Bad Request avec message `Paramètres géographiques invalides` dans le corps de la réponse"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/stations/id/{id}": {
+      "get": {
+        "description": "Récupère les informations d'une station à partir de son ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Informations d'une station"
+          },
+          "400": {
+            "description": "Bad Request avec message `ID station invalide` dans le corps de la réponse"
+          },
+          "404": {
+            "description": "Not Found avec message `Station introuvable` dans le corps de la réponse"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/stations/name/{name}": {
+      "get": {
+        "description": "Récupère les informations des stations à partir de leurs noms",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Informations des stations dont les noms et le paramètre name correspondent"
+          },
+          "400": {
+            "description": "Bad Request avec message `Parametre name invalide` dans le corps de la réponse"
+          },
+          "404": {
+            "description": "Not Found avec message `Aucune station nommée` de la sorte existe"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/stations/available": {
+      "get": {
+        "description": "Récupère la liste de toutes les stations disponibles",
+        "responses": {
+          "200": {
+            "description": "Liste de stations disponibles"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/stations/search": {
+      "get": {
+        "description": "Récupère la liste de toutes les stations correspondant aux critères de recherche",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste de stations correspondant aux critères de recherche"
+          },
+          "400": {
+            "description": "Bad Request avec message `Paramètre query invalide` dans le corps de la réponse"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/gonfleurs": {
+      "get": {
+        "description": "Récupère la liste de toutes les gonfleurs",
+        "responses": {
+          "200": {
+            "description": "Liste de gonfleurs"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/gonfleurs/city/{city}": {
+      "get": {
+        "description": "Récupère la liste de toutes les gonfleurs d'une ville",
+        "parameters": [
+          {
+            "name": "city",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste de gonfleurs"
+          },
+          "400": {
+            "description": "Bad Request avec message `Ville invalide` dans le corps de la réponse"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    },
+    "/gonfleurs/id/{id}": {
+      "get": {
+        "description": "Récupère les informations d'un gonfleur à partir de son ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Informations d'une gonfleur"
+          },
+          "400": {
+            "description": "Bad Request avec message `ID station invalide` dans le corps de la réponse"
+          },
+          "404": {
+            "description": "Not Found avec message `Gonfleur introuvable` dans le corps de la réponse"
+          },
+          "502": {
+            "description": "Bad Gateway avec un message d'erreur dans le corps de la réponse"
+          }
+        }
+      }
+    }
+  }
 }
