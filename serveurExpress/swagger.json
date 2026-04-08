@@ -1,0 +1,15 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Nantibus User API Documentation",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "host": "127.0.0.1:8081/api/v0",
+  "basePath": "/",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {}
+}

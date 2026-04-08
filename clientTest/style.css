@@ -1,0 +1,64 @@
+/* Style du client générer par claude IA */
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 24px;
+	font-family: Arial, sans-serif;
+	background-color: #f7f7f7;
+	color: #222;
+}
+
+h1 {
+	margin-top: 0;
+	margin-bottom: 16px;
+	font-size: 1.8rem;
+}
+
+#container {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	padding: 16px;
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+#btn {
+	padding: 10px 16px;
+	border: 1px solid #999;
+	border-radius: 6px;
+	background: #f0f0f0;
+	color: #111;
+	cursor: pointer;
+}
+
+#btn:hover {
+	background: #e4e4e4;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 16px;
+	background: #fff;
+}
+
+th,
+td {
+	border: 1px solid #ccc;
+	padding: 8px;
+	text-align: left;
+	font-size: 0.95rem;
+}
+
+th {
+	background: #efefef;
+}
+
+tr:nth-child(even) {
+	background: #fafafa;
+}

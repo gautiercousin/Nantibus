@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_horaire" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.13.1">
+  <bpmn:collaboration id="Collaboration_horaire">
+    <bpmn:participant id="Participant_Client" name="Client" processRef="Process_Client" />
+    <bpmn:participant id="Participant_Proxy" name="Proxy" processRef="Process_Proxy" />
+    <bpmn:participant id="Participant_1id29s6" name="Base de donnée" processRef="Process_1g9nkjt" />
+    <bpmn:messageFlow id="MessageFlow_client_proxy_request" sourceRef="Event_client_request" targetRef="Event_proxy_receive_request" />
+    <bpmn:messageFlow id="MessageFlow_proxy_client_data" sourceRef="Event_proxy_send_data" targetRef="Event_client_data" />
+    <bpmn:messageFlow id="Flow_0a1kwkk" sourceRef="Event_0vbiotg" targetRef="Participant_1id29s6" />
+    <bpmn:messageFlow id="Flow_0mvd91u" sourceRef="Participant_1id29s6" targetRef="Event_0c5d535" />
+    <bpmn:messageFlow id="Flow_1ggkzsv" sourceRef="Event_1dnkytf" targetRef="Event_client_data" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Client">
+    <bpmn:laneSet id="LaneSet_Client">
+      <bpmn:lane id="Lane_User" name="Utilisateur">
+        <bpmn:flowNodeRef>Event_user_open_app</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_user_open_schedule_page</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_user_search</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Mobile" name="Application mobile">
+        <bpmn:flowNodeRef>Event_end_success</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_end_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_show_error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_show_schedule</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_data_received</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_client_data</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_mobile_receive_data</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_mobile_wait</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_1c131fx</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_client_request</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Activity_mobile_send_schedule_request</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Event_user_open_app" name="ouvre l&#39;application mobile">
+      <bpmn:outgoing>Flow_c1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_user_open_schedule_page" name="accède à la page des horaires">
+      <bpmn:incoming>Flow_c1</bpmn:incoming>
+      <bpmn:outgoing>Flow_c2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Activity_user_search" name="réalise une recherche (parking, station vélo, etc)">
+      <bpmn:incoming>Flow_c2</bpmn:incoming>
+      <bpmn:outgoing>Flow_c3</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_c1" sourceRef="Event_user_open_app" targetRef="Activity_user_open_schedule_page" />
+    <bpmn:sequenceFlow id="Flow_c2" sourceRef="Activity_user_open_schedule_page" targetRef="Activity_user_search" />
+    <bpmn:sequenceFlow id="Flow_c3" sourceRef="Activity_user_search" targetRef="Activity_mobile_send_schedule_request" />
+    <bpmn:sequenceFlow id="Flow_c7" sourceRef="Event_mobile_wait" targetRef="Activity_mobile_receive_data" />
+    <bpmn:sequenceFlow id="Flow_c8" sourceRef="Activity_mobile_receive_data" targetRef="Event_client_data" />
+    <bpmn:sequenceFlow id="Flow_c9" sourceRef="Event_client_data" targetRef="Gateway_data_received" />
+    <bpmn:sequenceFlow id="Flow_c10_no" name="Non" sourceRef="Gateway_data_received" targetRef="Activity_show_error" />
+    <bpmn:sequenceFlow id="Flow_c10_yes" name="Oui" sourceRef="Gateway_data_received" targetRef="Activity_show_schedule" />
+    <bpmn:sequenceFlow id="Flow_c11" sourceRef="Activity_show_error" targetRef="Event_end_error" />
+    <bpmn:sequenceFlow id="Flow_c12" sourceRef="Activity_show_schedule" targetRef="Event_end_success" />
+    <bpmn:sequenceFlow id="Flow_05qpe5r" sourceRef="Event_client_request" targetRef="Activity_1c131fx" />
+    <bpmn:endEvent id="Event_end_success">
+      <bpmn:incoming>Flow_c12</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateDef_client" />
+    </bpmn:endEvent>
+    <bpmn:endEvent id="Event_end_error" name="Erreur">
+      <bpmn:incoming>Flow_c11</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorDef_client" />
+    </bpmn:endEvent>
+    <bpmn:scriptTask id="Activity_show_error" name="Afficher Erreur">
+      <bpmn:incoming>Flow_c10_no</bpmn:incoming>
+      <bpmn:outgoing>Flow_c11</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Activity_show_schedule" name="affiche les horaires à l&#39;utilisateur">
+      <bpmn:incoming>Flow_c10_yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_c12</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="Gateway_data_received" name="Recevoir data ?">
+      <bpmn:incoming>Flow_c9</bpmn:incoming>
+      <bpmn:outgoing>Flow_c10_no</bpmn:outgoing>
+      <bpmn:outgoing>Flow_c10_yes</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="Event_client_data" name="data">
+      <bpmn:incoming>Flow_c8</bpmn:incoming>
+      <bpmn:outgoing>Flow_c9</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageDef_client_data" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:receiveTask id="Activity_mobile_receive_data" name="Reception data">
+      <bpmn:incoming>Flow_c7</bpmn:incoming>
+      <bpmn:outgoing>Flow_c8</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:intermediateCatchEvent id="Event_mobile_wait" name="attendre">
+      <bpmn:incoming>Flow_1j7f8v5</bpmn:incoming>
+      <bpmn:outgoing>Flow_c7</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerDef_mobile_wait" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1j7f8v5" sourceRef="Activity_1c131fx" targetRef="Event_mobile_wait" />
+    <bpmn:task id="Activity_1c131fx" name="se met en attente">
+      <bpmn:incoming>Flow_05qpe5r</bpmn:incoming>
+      <bpmn:outgoing>Flow_1j7f8v5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateThrowEvent id="Event_client_request" name="requete">
+      <bpmn:incoming>Flow_15d4r98</bpmn:incoming>
+      <bpmn:outgoing>Flow_05qpe5r</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageDef_client_request" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sendTask id="Activity_mobile_send_schedule_request" name="envoie la recherche d&#39;horaires au Proxy">
+      <bpmn:incoming>Flow_c3</bpmn:incoming>
+      <bpmn:outgoing>Flow_15d4r98</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sequenceFlow id="Flow_15d4r98" sourceRef="Activity_mobile_send_schedule_request" targetRef="Event_client_request" />
+  </bpmn:process>
+  <bpmn:process id="Process_Proxy">
+    <bpmn:sequenceFlow id="Flow_p1" sourceRef="Event_proxy_receive_request" targetRef="Activity_proxy_fetch_schedules" />
+    <bpmn:sequenceFlow id="Flow_p3" sourceRef="Activity_proxy_process_schedules" targetRef="Activity_proxy_send_schedules" />
+    <bpmn:sequenceFlow id="Flow_p4" sourceRef="Activity_proxy_send_schedules" targetRef="Event_proxy_send_data" />
+    <bpmn:intermediateCatchEvent id="Event_proxy_receive_request" name="requete">
+      <bpmn:outgoing>Flow_p1</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageDef_proxy_receive_request" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:scriptTask id="Activity_proxy_fetch_schedules" name="demande les donnée a la bd">
+      <bpmn:incoming>Flow_p1</bpmn:incoming>
+      <bpmn:outgoing>Flow_1rr7jtt</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1rr7jtt" sourceRef="Activity_proxy_fetch_schedules" targetRef="Event_0vbiotg" />
+    <bpmn:intermediateThrowEvent id="Event_0vbiotg" name="request">
+      <bpmn:incoming>Flow_1rr7jtt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ihcfr4</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1n3073t" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:task id="Activity_1feknvt" name="se met en attente">
+      <bpmn:incoming>Flow_0ihcfr4</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dlbqj6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_0ihcfr4" sourceRef="Event_0vbiotg" targetRef="Activity_1feknvt" />
+    <bpmn:sequenceFlow id="Flow_0dlbqj6" sourceRef="Activity_1feknvt" targetRef="Event_1hl24da" />
+    <bpmn:intermediateCatchEvent id="Event_1hl24da">
+      <bpmn:incoming>Flow_0dlbqj6</bpmn:incoming>
+      <bpmn:outgoing>Flow_1s81yfs</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0xa5d07" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="Activity_1xehjks" name="reçois les donnée">
+      <bpmn:incoming>Flow_1s81yfs</bpmn:incoming>
+      <bpmn:outgoing>Flow_0s3lbn6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_1s81yfs" sourceRef="Event_1hl24da" targetRef="Activity_1xehjks" />
+    <bpmn:sequenceFlow id="Flow_0s3lbn6" sourceRef="Activity_1xehjks" targetRef="Event_0c5d535" />
+    <bpmn:intermediateCatchEvent id="Event_0c5d535" name="data">
+      <bpmn:incoming>Flow_0s3lbn6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kx2mu2</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0edfadv" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="Event_proxy_send_data" name="data">
+      <bpmn:incoming>Flow_p4</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageDef_proxy_send_data" />
+    </bpmn:endEvent>
+    <bpmn:scriptTask id="Activity_proxy_send_schedules" name="envoie les données d&#39;horaires à l&#39;application mobile">
+      <bpmn:incoming>Flow_p3</bpmn:incoming>
+      <bpmn:outgoing>Flow_p4</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="Activity_proxy_process_schedules" name="traite les données d&#39;horaires">
+      <bpmn:incoming>Flow_1ci2lki</bpmn:incoming>
+      <bpmn:outgoing>Flow_p3</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:exclusiveGateway id="Gateway_1hb9pkm" name="data ?">
+      <bpmn:incoming>Flow_0kx2mu2</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ci2lki</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1q6bk7l</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0kx2mu2" sourceRef="Event_0c5d535" targetRef="Gateway_1hb9pkm" />
+    <bpmn:sequenceFlow id="Flow_1ci2lki" name="oui" sourceRef="Gateway_1hb9pkm" targetRef="Activity_proxy_process_schedules" />
+    <bpmn:task id="Activity_18cx2g0" name="renvoie une erreur">
+      <bpmn:incoming>Flow_1q6bk7l</bpmn:incoming>
+      <bpmn:outgoing>Flow_0f13tkt</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_0f13tkt" sourceRef="Activity_18cx2g0" targetRef="Event_1dnkytf" />
+    <bpmn:endEvent id="Event_1dnkytf" name="erreur">
+      <bpmn:incoming>Flow_0f13tkt</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0bu8t5g" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1q6bk7l" name="non" sourceRef="Gateway_1hb9pkm" targetRef="Activity_18cx2g0" />
+  </bpmn:process>
+  <bpmn:process id="Process_1g9nkjt" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_horaire">
+    <bpmndi:BPMNPlane id="BPMNPlane_horaire" bpmnElement="Collaboration_horaire">
+      <bpmndi:BPMNShape id="Participant_Client_di" bpmnElement="Participant_Client" isHorizontal="true">
+        <dc:Bounds x="140" y="80" width="1730" height="460" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Mobile_di" bpmnElement="Lane_Mobile" isHorizontal="true">
+        <dc:Bounds x="170" y="290" width="1700" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_User_di" bpmnElement="Lane_User" isHorizontal="true">
+        <dc:Bounds x="170" y="80" width="1700" height="210" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_user_open_app_di" bpmnElement="Event_user_open_app">
+        <dc:Bounds x="230" y="167" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_user_open_schedule_page_di" bpmnElement="Activity_user_open_schedule_page">
+        <dc:Bounds x="320" y="145" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_user_search_di" bpmnElement="Activity_user_search">
+        <dc:Bounds x="500" y="145" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_end_success_di" bpmnElement="Event_end_success">
+        <dc:Bounds x="1782" y="322" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_end_error_di" bpmnElement="Event_end_error">
+        <dc:Bounds x="1782" y="422" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1783" y="458" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_show_error_di" bpmnElement="Activity_show_error">
+        <dc:Bounds x="1575" y="405" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_show_schedule_di" bpmnElement="Activity_show_schedule">
+        <dc:Bounds x="1555" y="305" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_data_received_di" bpmnElement="Gateway_data_received" isMarkerVisible="true">
+        <dc:Bounds x="1365" y="365" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1425" y="383" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_client_data_di" bpmnElement="Event_client_data">
+        <dc:Bounds x="1302" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1307.5" y="348" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_mobile_receive_data_di" bpmnElement="Activity_mobile_receive_data">
+        <dc:Bounds x="1130" y="350" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_mobile_wait_di" bpmnElement="Event_mobile_wait">
+        <dc:Bounds x="1002" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="996" y="408" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1c131fx_di" bpmnElement="Activity_1c131fx">
+        <dc:Bounds x="790" y="350" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_client_request_di" bpmnElement="Event_client_request">
+        <dc:Bounds x="702" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="698" y="348" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_mobile_send_schedule_request_di" bpmnElement="Activity_mobile_send_schedule_request">
+        <dc:Bounds x="500" y="350" width="170" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_c1_di" bpmnElement="Flow_c1">
+        <di:waypoint x="266" y="185" />
+        <di:waypoint x="320" y="185" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c2_di" bpmnElement="Flow_c2">
+        <di:waypoint x="450" y="185" />
+        <di:waypoint x="500" y="185" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c3_di" bpmnElement="Flow_c3">
+        <di:waypoint x="585" y="225" />
+        <di:waypoint x="585" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c7_di" bpmnElement="Flow_c7">
+        <di:waypoint x="1038" y="390" />
+        <di:waypoint x="1130" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c8_di" bpmnElement="Flow_c8">
+        <di:waypoint x="1250" y="390" />
+        <di:waypoint x="1302" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c9_di" bpmnElement="Flow_c9">
+        <di:waypoint x="1338" y="390" />
+        <di:waypoint x="1365" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c10_no_di" bpmnElement="Flow_c10_no">
+        <di:waypoint x="1390" y="415" />
+        <di:waypoint x="1390" y="440" />
+        <di:waypoint x="1575" y="440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1399" y="420" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c10_yes_di" bpmnElement="Flow_c10_yes">
+        <di:waypoint x="1390" y="365" />
+        <di:waypoint x="1390" y="340" />
+        <di:waypoint x="1555" y="340" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1482" y="317" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c11_di" bpmnElement="Flow_c11">
+        <di:waypoint x="1705" y="440" />
+        <di:waypoint x="1782" y="440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_c12_di" bpmnElement="Flow_c12">
+        <di:waypoint x="1685" y="340" />
+        <di:waypoint x="1782" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05qpe5r_di" bpmnElement="Flow_05qpe5r">
+        <di:waypoint x="738" y="390" />
+        <di:waypoint x="790" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1j7f8v5_di" bpmnElement="Flow_1j7f8v5">
+        <di:waypoint x="890" y="390" />
+        <di:waypoint x="1002" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15d4r98_di" bpmnElement="Flow_15d4r98">
+        <di:waypoint x="670" y="390" />
+        <di:waypoint x="702" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_Proxy_di" bpmnElement="Participant_Proxy" isHorizontal="true">
+        <dc:Bounds x="140" y="590" width="1720" height="220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_proxy_receive_request_di" bpmnElement="Event_proxy_receive_request">
+        <dc:Bounds x="222" y="682" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="718" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_proxy_fetch_schedules_di" bpmnElement="Activity_proxy_fetch_schedules">
+        <dc:Bounds x="295" y="660" width="170" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17af43q_di" bpmnElement="Event_0vbiotg">
+        <dc:Bounds x="502" y="682" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="499" y="652" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1feknvt_di" bpmnElement="Activity_1feknvt">
+        <dc:Bounds x="580" y="660" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0qjhg9f_di" bpmnElement="Event_1hl24da">
+        <dc:Bounds x="722" y="682" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1xehjks_di" bpmnElement="Activity_1xehjks">
+        <dc:Bounds x="800" y="660" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hvg68p_di" bpmnElement="Event_0c5d535">
+        <dc:Bounds x="942" y="682" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="948" y="652" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_proxy_send_data_di" bpmnElement="Event_proxy_send_data">
+        <dc:Bounds x="1782" y="642" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1788" y="678" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_proxy_send_schedules_di" bpmnElement="Activity_proxy_send_schedules">
+        <dc:Bounds x="1570" y="620" width="180" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_proxy_process_schedules_di" bpmnElement="Activity_proxy_process_schedules">
+        <dc:Bounds x="1360" y="620" width="160" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1hb9pkm_di" bpmnElement="Gateway_1hb9pkm" isMarkerVisible="true">
+        <dc:Bounds x="1065" y="675" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1120" y="693" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_18cx2g0_di" bpmnElement="Activity_18cx2g0">
+        <dc:Bounds x="1360" y="710" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0qlpjsx_di" bpmnElement="Event_1dnkytf">
+        <dc:Bounds x="1512" y="732" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1513" y="775" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_p1_di" bpmnElement="Flow_p1">
+        <di:waypoint x="258" y="700" />
+        <di:waypoint x="295" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_p3_di" bpmnElement="Flow_p3">
+        <di:waypoint x="1520" y="660" />
+        <di:waypoint x="1570" y="660" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_p4_di" bpmnElement="Flow_p4">
+        <di:waypoint x="1750" y="660" />
+        <di:waypoint x="1782" y="660" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1rr7jtt_di" bpmnElement="Flow_1rr7jtt">
+        <di:waypoint x="465" y="700" />
+        <di:waypoint x="502" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ihcfr4_di" bpmnElement="Flow_0ihcfr4">
+        <di:waypoint x="538" y="700" />
+        <di:waypoint x="580" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dlbqj6_di" bpmnElement="Flow_0dlbqj6">
+        <di:waypoint x="680" y="700" />
+        <di:waypoint x="722" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1s81yfs_di" bpmnElement="Flow_1s81yfs">
+        <di:waypoint x="758" y="700" />
+        <di:waypoint x="800" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0s3lbn6_di" bpmnElement="Flow_0s3lbn6">
+        <di:waypoint x="900" y="700" />
+        <di:waypoint x="942" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kx2mu2_di" bpmnElement="Flow_0kx2mu2">
+        <di:waypoint x="978" y="700" />
+        <di:waypoint x="1065" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ci2lki_di" bpmnElement="Flow_1ci2lki">
+        <di:waypoint x="1090" y="675" />
+        <di:waypoint x="1090" y="660" />
+        <di:waypoint x="1360" y="660" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1097" y="665" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0f13tkt_di" bpmnElement="Flow_0f13tkt">
+        <di:waypoint x="1460" y="750" />
+        <di:waypoint x="1512" y="750" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1q6bk7l_di" bpmnElement="Flow_1q6bk7l">
+        <di:waypoint x="1090" y="725" />
+        <di:waypoint x="1090" y="750" />
+        <di:waypoint x="1360" y="750" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1095" y="735" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participant_1id29s6_di" bpmnElement="Participant_1id29s6" isHorizontal="true">
+        <dc:Bounds x="140" y="830" width="1460" height="250" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="MessageFlow_client_proxy_request_di" bpmnElement="MessageFlow_client_proxy_request">
+        <di:waypoint x="720" y="408" />
+        <di:waypoint x="720" y="553" />
+        <di:waypoint x="240" y="553" />
+        <di:waypoint x="240" y="682" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_proxy_client_data_di" bpmnElement="MessageFlow_proxy_client_data">
+        <di:waypoint x="1800" y="642" />
+        <di:waypoint x="1800" y="560" />
+        <di:waypoint x="1320" y="560" />
+        <di:waypoint x="1320" y="408" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a1kwkk_di" bpmnElement="Flow_0a1kwkk">
+        <di:waypoint x="520" y="718" />
+        <di:waypoint x="520" y="830" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mvd91u_di" bpmnElement="Flow_0mvd91u">
+        <di:waypoint x="960" y="830" />
+        <di:waypoint x="960" y="718" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ggkzsv_di" bpmnElement="Flow_1ggkzsv">
+        <di:waypoint x="1548" y="750" />
+        <di:waypoint x="1840" y="750" />
+        <di:waypoint x="1840" y="570" />
+        <di:waypoint x="1320" y="570" />
+        <di:waypoint x="1320" y="408" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

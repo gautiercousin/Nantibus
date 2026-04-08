@@ -1,0 +1,35 @@
+{
+  "name": "03-mvc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "nodemon server.mjs",
+    "test": "node --test --experimental-test-coverage --test-force-exit test/*",
+    "mutation": "stryker run",
+    "start-gendoc": "node swagger-autogen.mjs"
+  },
+  "type": "module",
+  "author": "jub",
+  "license": "ISC",
+  "dependencies": {
+    "c8": "^9.1.0",
+    "chai": "^5.0.3",
+    "dotenv": "^16.4.1",
+    "express": "^4.21.2",
+    "https-proxy-agent": "^7.0.6",
+    "mocha": "^10.2.0",
+    "mongodb": "^6.3.0",
+    "mongodb-memory-server": "^9.1.6",
+    "mongoose": "^8.1.1",
+    "node-fetch": "^3.3.2",
+    "nodemon": "^3.0.3",
+    "regex-escape": "^3.4.11",
+    "supertest": "^6.3.4",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "^8.0.0"
+  }
+}
